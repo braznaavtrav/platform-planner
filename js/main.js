@@ -22,7 +22,7 @@ require.config({
       {
         name: 'physicsjs',
         location: 'lib/physicsjs',
-        main: 'physicsjs-0.5.1.min'
+        main: 'physicsjs-0.5.3.min'
       }
     ],
     paths: {
