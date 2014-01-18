@@ -2,131 +2,109 @@
 
 require.config({
     shim: {
-        /*
-        underscore: {
-          exports: '_'
-        },
-        backbone: {
-          deps: ["underscore", "jquery"],
-          exports: "Backbone"
-        },
-        bootstrap: {
-          deps: ["jquery"],
-        }
-        */
+      // underscore: {
+      //   exports: '_'
+      // },
+      // backbone: {
+      //   deps: ["underscore", "jquery"],
+      //   exports: "Backbone"
+      // },
+      // bootstrap: {
+      //   deps: ["jquery"],
+      // }
+      newton: {
+        exports: 'Newton'
+      }
     },
     baseUrl: 'js/',
-    packages: [
-      {
-        name: 'physicsjs',
-        location: 'lib/physicsjs/dist',
-        main: 'physicsjs-0.5.3.min'
-      }
-    ],
+    // packages: [
+    //   {
+    //     name: 'physicsjs',
+    //     location: 'lib/physicsjs/dist',
+    //     main: 'physicsjs-0.5.3.min'
+    //   }
+    // ],
     paths: {
-        //'backbone': 'backbone-1.0.0',
-        'jquery': 'lib/jquery-1.10.2',
-        //'knockout': 'knockout-2.2.0.debug',
-        //'knockback': 'knockback-0.17.2',
-        //'underscore': 'underscore-1.5.1'
+      //'backbone': 'backbone-1.0.0',
+      'jquery': 'lib/jquery-1.10.2',
+      'newton': 'lib/newton-0.0.4'
     },
     config: {}
-})
+});
 
-
-require(['jquery', 'physicsjs', 'physicsjs/renderers/canvas', 'physicsjs/bodies/circle', 'physicsjs/behaviors/edge-collision-detection', 'physicsjs/behaviors/body-impulse-response', 'physicsjs/behaviors/constant-acceleration', 'physicsjs/bodies/convex-polygon'], 
-  function ($, Physics) {
-    /**
-     * PhysicsJS by Jasper Palfree <wellcaffeinated.net>
-     * http://wellcaffeinated.net/PhysicsJS
-     *
-     * Simple "Hello world" example
-     */
-    Physics(function(world){
-
-      var viewWidth = 1024;
-      var viewHeight = 768;
-            
-      var renderer = Physics.renderer('canvas', {
-        el: 'display',
-        width: viewWidth,
-        height: viewHeight,
-        meta: false, // don't display meta data
-        styles: {
-            // set colors for the circle bodies
-            'circle' : {
-                strokeStyle: 'hsla(60, 37%, 17%, 1)',
-                lineWidth: 1,
-                fillStyle: 'hsla(60, 37%, 57%, 0.8)',
-                angleIndicator: 'hsla(60, 37%, 17%, 0.4)'
-            }
-        }
-      });
-
-      // add the renderer
-      world.add( renderer );
-      // render on each step
-      world.subscribe('step', function(){
-        world.render();
-      });
-      
-      // bounds of the window
-      var viewportBounds = Physics.aabb(0, 0, viewWidth, viewHeight);
-      
-      // constrain objects to these bounds
-      world.add(Physics.behavior('edge-collision-detection', {
-          aabb: viewportBounds,
-          restitution: 0.99,
-          cof: 0.99
-      }));
-
-      world.add(Physics.behavior('body-impulse-response', {
-          aabb: Physics.aabb(100, 100, 200, 120),
-          restitution: 0.99,
-          cof: 0.99
-      }));
-
-      // add a circle
-      world.add(
-          Physics.body('circle', {
-            x: 150, // x-coordinate
-            y: 50, // y-coordinate
-            vx: 0, // velocity in x-direction
-            vy: 0.01, // velocity in y-direction
-            radius: 20
-          })
-      );
-
-      var square = Physics.body('convex-polygon', {
-          // place the center of the square at (0, 0)
-          x: 0,
-          y: 0,
-          vertices: [
-              { x: 0, y: 0 },
-              { x: 0, y: 20 },
-              { x: 20, y: 20 },
-              { x: 20, y: 0 }
-          ]
-      });
-
-      world.add(square);
-
-      // ensure objects bounce when edge collision is detected
-      world.add( Physics.behavior('body-impulse-response') );
-
-      // add some gravity
-      world.add( Physics.behavior('constant-acceleration') );
-
-      // subscribe to ticker to advance the simulation
-      Physics.util.ticker.subscribe(function( time, dt ){
-        
-          world.step( time );
-      });
-
-      // start the ticker
-      Physics.util.ticker.start();
-
-    });
+require(['jquery', 'newton'], 
+  function ($, Newton) {
+    'use strict';
     
+    var renderer = Newton.Renderer(document.getElementById('display'));
+    var sim = Newton.Simulator(simulate, renderer.callback, 60);
+    
+    var envLayer = sim.Layer();
+    var fixedLayer = sim.Layer();
+    var playerLayer = sim.Layer();
+
+    var material = Newton.Material({
+      weight: 2,
+      restitution: 0.5,
+      friction: 0.2,
+      maxVelocity: 50
+    });
+
+    var gravity = Newton.LinearGravity(0, 0.001, 0);
+    var terrain = Newton.Body();
+    var player = Newton.Body();
+
+    envLayer                // shared forces like gravity
+      .addForce(gravity);
+
+    fixedLayer              // responds to no forces, no collisions
+      .respondTo([])
+      .addBody(terrain);
+
+    playerLayer             // responds to forces and collisions on all layers
+      .addBody(player)
+      .respondTo([playerLayer, fixedLayer, envLayer]);
+
+    sim.start();
+
+    var p1 = Newton.Particle(100, 100, 2);
+    var p2 = Newton.Particle(200, 100, 2);
+    var edge = Newton.Edge(p1, p2, material);
+    terrain.addEdge(edge);
+
+    var characterAA = {x: 125, y: 10};
+    var characterBB = {x: 175, y: 50};
+
+    box(characterAA, characterBB, player, material);
+
+    function box(aa, bb, body, material) {
+      // create 4 particles
+      var tl = Newton.Particle(aa.x, aa.y, 3);
+      var tr = Newton.Particle(bb.x, aa.y, 3);
+      var br = Newton.Particle(bb.x, bb.y, 3);
+      var bl = Newton.Particle(aa.x, bb.y, 3);
+      // create edges between particles
+      var top = Newton.Edge(tl, tr, material);
+      var right = Newton.Edge(tr, br, material);
+      var bottom = Newton.Edge(br, bl, material);
+      var left = Newton.Edge(bl, tl, material);
+      // create constraints
+      // var tc = tl.DistanceConstraint(tr, top.length, 2, 0);
+      // var rc = tr.DistanceConstraint(br, right.length, 2, 0);
+      // var bc = br.DistanceConstraint(bl, bottom.length, 2, 0);
+      // var lc = bl.DistanceConstraint(tl, left.length, 2, 0);
+      body.addParticle(tl);
+      body.addParticle(tr);
+      body.addParticle(br);
+      body.addParticle(bl);
+      body.addEdge(top);
+      body.addEdge(right);
+      body.addEdge(bottom);
+      body.addEdge(left);
+    }
+
+    function simulate(time) {
+    }
+
   }
 );
