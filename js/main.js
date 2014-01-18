@@ -12,8 +12,11 @@ require.config({
       // bootstrap: {
       //   deps: ["jquery"],
       // }
-      newton: {
-        exports: 'Newton'
+      // newton: {
+      //   exports: 'Newton'
+      // }
+      box2dweb: {
+        exports: 'Box2D'
       }
     },
     baseUrl: 'js/',
@@ -27,83 +30,68 @@ require.config({
     paths: {
       //'backbone': 'backbone-1.0.0',
       'jquery': 'lib/jquery-1.10.2',
-      'newton': 'lib/newton-0.0.4'
+      // 'newton': 'lib/newton-0.0.4'
+      'box2dweb': 'lib/box2dweb',
+      'easeljs': 'lib/easeljs-0.7.1.min'
     },
     config: {}
 });
 
-require(['jquery', 'newton'], 
-  function ($, Newton) {
+require(['jquery', 'box2dweb', 'easeljs'], 
+  function ($, Box2D) {
     'use strict';
     
-    var renderer = Newton.Renderer(document.getElementById('display'));
-    var sim = Newton.Simulator(simulate, renderer.callback, 60);
-    
-    var envLayer = sim.Layer();
-    var fixedLayer = sim.Layer();
-    var playerLayer = sim.Layer();
+    var box2d = {
+      b2Vec2: Box2D.Common.Math.b2Vec2,
+      b2BodyDef: Box2D.Dynamics.b2BodyDef,
+      b2Body: Box2D.Dynamics.b2Body,
+      b2FixtureDef: Box2D.Dynamics.b2FixtureDef,
+      b2Fixture: Box2D.Dynamics.b2Fixture,
+      b2World: Box2D.Dynamics.b2World,
+      b2MassData: Box2D.Collision.Shapes.b2MassData,
+      b2PolygonShape: Box2D.Collision.Shapes.b2PolygonShape,
+      b2CircleShape: Box2D.Collision.Shapes.b2CircleShape,
+      b2DebugDraw: Box2D.Dynamics.b2DebugDraw
+    };
 
-    var material = Newton.Material({
-      weight: 2,
-      restitution: 0.5,
-      friction: 0.2,
-      maxVelocity: 50
-    });
+    var SCALE = 30,
+        stage,
+        world;
 
-    var gravity = Newton.LinearGravity(0, 0.001, 0);
-    var terrain = Newton.Body();
-    var player = Newton.Body();
+    stage = new createjs.Stage(document.getElementById('display'));
 
-    envLayer                // shared forces like gravity
-      .addForce(gravity);
+    setUpPhysics();
 
-    fixedLayer              // responds to no forces, no collisions
-      .respondTo([])
-      .addBody(terrain);
+    createjs.Ticker.addListener(this);
+    createjs.Ticker.setFPS(60);
+    createjs.Ticker.useRAF = true;
 
-    playerLayer             // responds to forces and collisions on all layers
-      .addBody(player)
-      .respondTo([playerLayer, fixedLayer, envLayer]);
+    function setupPhysics() {
+      // create world
+      world = new box2d.b2World(new box2d.b2Vec2(0, 50), true);
 
-    sim.start();
+      // create ground
+      var fixDef = new box2d.b2FixtureDef();
+      fixDef.density = 1;
+      fixDef.friction = 0.5;
+      var bodyDef = new box2d.b2BodyDef();
+      bodyDef.type = box2d.b2Body.b2_staticBody;
+      bodyDef.position.x = 400 / SCALE;
+      bodyDef.position.y = 600 / SCALE;
+      fixDef.shape = new box2d.b2PolygonShape();
+      fixDef.shape.SetAsBox(400 / SCALE, 10 / SCALE);
+      world
+        .CreateBody(bodyDef)
+        .CreateFixture(fixDef);
 
-    var p1 = Newton.Particle(100, 100, 2);
-    var p2 = Newton.Particle(200, 100, 2);
-    var edge = Newton.Edge(p1, p2, material);
-    terrain.addEdge(edge);
-
-    var characterAA = {x: 125, y: 10};
-    var characterBB = {x: 175, y: 50};
-
-    box(characterAA, characterBB, player, material);
-
-    function box(aa, bb, body, material) {
-      // create 4 particles
-      var tl = Newton.Particle(aa.x, aa.y, 3);
-      var tr = Newton.Particle(bb.x, aa.y, 3);
-      var br = Newton.Particle(bb.x, bb.y, 3);
-      var bl = Newton.Particle(aa.x, bb.y, 3);
-      // create edges between particles
-      var top = Newton.Edge(tl, tr, material);
-      var right = Newton.Edge(tr, br, material);
-      var bottom = Newton.Edge(br, bl, material);
-      var left = Newton.Edge(bl, tl, material);
-      // create constraints
-      // var tc = tl.DistanceConstraint(tr, top.length, 2, 0);
-      // var rc = tr.DistanceConstraint(br, right.length, 2, 0);
-      // var bc = br.DistanceConstraint(bl, bottom.length, 2, 0);
-      // var lc = bl.DistanceConstraint(tl, left.length, 2, 0);
-      body.addParticle(tl);
-      body.addParticle(tr);
-      body.addParticle(br);
-      body.addParticle(bl);
-      body.addEdge(top);
-      body.addEdge(right);
-      body.addEdge(bottom);
-      body.addEdge(left);
+      // setup debug draw
+      var debugDraw = new box2d.b2DebugDraw();
+      debugDraw.SetSprite(stage.canvas.getContext('2d'));
+      debugDraw.SetDra
     }
 
-    function simulate(time) {
+    function tick() {
+
     }
 
   }
