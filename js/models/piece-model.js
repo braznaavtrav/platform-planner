@@ -3,7 +3,6 @@ define(['jquery', 'utils'],
     'use strict';
 
     var Piece = function (pos, name) {
-      console.log(pos, name);
       var self = this,
           width = 176,
           height = 45;
