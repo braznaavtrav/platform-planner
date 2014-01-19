@@ -5,8 +5,24 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Platform Planner</title>
   <script src="js/require.js" data-main="js/main.js"></script>
+  <style>
+  	body {
+  		background: #ccc;
+  	}
+  	#display {
+  		background: #fff;
+  		position: absolute;
+  		z-index: 2;
+  		opacity: 0.5;
+  	}
+  	#debug {
+  		position: absolute;
+  		z-index: 1;
+  	}
+  </style>
 </head>
 <body>
   <canvas id="display" width="1024" height="768"></canvas>
+  <canvas id="debug" width="1024" height="768"></canvas>
 </body>
 </html>
