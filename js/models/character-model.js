@@ -7,6 +7,9 @@ define(['jquery', 'easeljs', 'utils'],
           width = 100,
           height = 171;
 
+      // create dynamic body
+
+      // create spritesheet
       self.spriteSheet = new createjs.SpriteSheet({
         framerate: 5,
         images: ['../img/character-sprite.png'],
@@ -24,32 +27,30 @@ define(['jquery', 'easeljs', 'utils'],
         }
       });
 
-      var animation = new createjs.Sprite(self.spriteSheet, 'standLeft');
-      animation.x = 100;
-      animation.y = 50;
-      utils.stage.addChild(animation);
+      // attach spritesheet to dynamic body
+      var fixDef = new utils.box2d.b2FixtureDef();
+      fixDef.density = 1;
+      fixDef.friction = 0.5;
+      fixDef.restitution = 0.5;
+      var bodyDef = new utils.box2d.b2BodyDef();
+      bodyDef.type = utils.box2d.b2Body.b2_dynamicBody;
+      bodyDef.position.x = 250 / utils.SCALE;
+      bodyDef.position.y = 10 / utils.SCALE;
+      fixDef.shape = new utils.box2d.b2PolygonShape();
+      fixDef.shape.SetAsBox(width/2/utils.SCALE, height/2/utils.SCALE);
+      self.body = utils.world.CreateBody(bodyDef);
+      self.body.CreateFixture(fixDef);
 
-      // this.view = new createjs.Bitmap('../img/piece-' + name + '.png');
-      // this.view.regX = width/2;
-      // this.view.regY = height/2;
-      // var fixDef = new utils.box2d.b2FixtureDef();
-      // fixDef.density = 1;
-      // fixDef.friction = 0.5;
-      // fixDef.restitution = 0.5;
-      // var bodyDef = new utils.box2d.b2BodyDef();
-      // bodyDef.type = utils.box2d.b2Body.b2_staticBody;
-      // bodyDef.position.x = pos.x / utils.SCALE;
-      // bodyDef.position.y = pos.y / utils.SCALE;
-      // fixDef.shape = new utils.box2d.b2PolygonShape();
-      // fixDef.shape.SetAsBox(width/2/utils.SCALE, height/2/utils.SCALE);
-      // this.view.body = utils.world.CreateBody(bodyDef);
-      // this.view.body.CreateFixture(fixDef);
-      // utils.stage.addChild(self.view);
-      // this.view.on('tick', function (e) {
-      //   this.x = this.body.GetPosition().x * utils.SCALE;
-      //   this.y = this.body.GetPosition().y * utils.SCALE;
-      //   this.rotation = this.body.GetAngle() * (180/Math.PI);
-      // });
+      // create animation
+      self.animation = new createjs.Sprite(self.spriteSheet, 'standLeft');
+
+      utils.stage.addChild(self.animation);
+
+      self.animation.on('tick', function (e) {
+        self.animation.x = self.body.GetPosition().x * utils.SCALE;
+        self.animation.y = self.body.GetPosition().y * utils.SCALE + 12;
+        self.rotation = self.body.GetAngle() * (180/Math.PI);
+      });
     };
 
     return Character;
