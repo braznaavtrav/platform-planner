@@ -11,7 +11,6 @@ define(['jquery', 'easeljs', 'utils'],
 
       // create spritesheet
       self.spriteSheet = new createjs.SpriteSheet({
-        framerate: 5,
         images: ['../img/character-sprite.png'],
         frames: {
           width: width,
@@ -20,10 +19,16 @@ define(['jquery', 'easeljs', 'utils'],
           regY: height/2
         },
         animations: {
-          standRight: [0],
-          standLeft: [1],
-          walkRight: [2, 4],
-          walkLeft: [3, 5], 
+          'stand right': [0],
+          'stand left': [1],
+          'walk right': {
+            frames: [2, 0, 4, 0],
+            speed: 0.1
+          },
+          'walk left': {
+            frames: [3, 1, 5, 1],
+            speed: 0.1
+          } 
         }
       });
 
@@ -31,7 +36,7 @@ define(['jquery', 'easeljs', 'utils'],
       var fixDef = new utils.box2d.b2FixtureDef();
       fixDef.density = 1;
       fixDef.friction = 0.5;
-      fixDef.restitution = 0.5;
+      fixDef.restitution = 0.2;
       var bodyDef = new utils.box2d.b2BodyDef();
       bodyDef.type = utils.box2d.b2Body.b2_dynamicBody;
       bodyDef.position.x = 250 / utils.SCALE;
@@ -40,17 +45,28 @@ define(['jquery', 'easeljs', 'utils'],
       fixDef.shape.SetAsBox(width/2/utils.SCALE, height/2/utils.SCALE);
       self.body = utils.world.CreateBody(bodyDef);
       self.body.CreateFixture(fixDef);
+      
+      self.setTick = function () {
+        var self = this;
+        self.animation.on('tick', function (e) {
+          self.animation.x = self.body.GetPosition().x * utils.SCALE;
+          self.animation.y = self.body.GetPosition().y * utils.SCALE + 12;
+          self.animation.rotation = self.body.GetAngle() * (180/Math.PI);
+        });
+      };
 
-      // create animation
-      self.animation = new createjs.Sprite(self.spriteSheet, 'standLeft');
+      self.performCommand = function (command) {
+        var self = this;
+        if (self.animation) {
+          utils.stage.removeChild(self.animation);
+        }
+        self.animation = new createjs.Sprite(self.spriteSheet, command);
+        utils.stage.addChild(self.animation);
+        self.setTick();
+      };
 
-      utils.stage.addChild(self.animation);
+      self.performCommand('stand right');
 
-      self.animation.on('tick', function (e) {
-        self.animation.x = self.body.GetPosition().x * utils.SCALE;
-        self.animation.y = self.body.GetPosition().y * utils.SCALE + 12;
-        self.rotation = self.body.GetAngle() * (180/Math.PI);
-      });
     };
 
     return Character;

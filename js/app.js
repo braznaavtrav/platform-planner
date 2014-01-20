@@ -47,8 +47,7 @@ define(['jquery', 'box2dweb', 'easeljs', 'utils', 'models/level-model'],
       // setup pieces
       var level = new Level();
       level.commands = [
-        {command: 'run right', position: 'fixed'},
-        {command: 'jump', position: 'fixed'}
+        {command: 'walk right', position: 'fixed', seconds: 3}
       ];
       level.pieces = ['normal'];
       level.startPos.x = 290;
