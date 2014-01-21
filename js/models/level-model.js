@@ -51,6 +51,9 @@ define(['jquery', 'easeljs', 'utils', 'models/piece-model', 'models/character-mo
             self.running = false;
             self.goButton.text.text = 'RUN';
             self.goButton.shape.graphics.beginFill('#88FF4C').drawRect(0, 700, self.goButton.w, self.goButton.h);
+            console.log('resetting');
+            self.character.remove();
+            self.character = new Character();
           }
           else {
             self.running = true;

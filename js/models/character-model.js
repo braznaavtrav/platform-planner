@@ -7,7 +7,7 @@ define(['jquery', 'easeljs', 'utils'],
           width = 100,
           height = 171;
 
-      // create dynamic body
+      self.walkSpeed = 5;
 
       // create spritesheet
       self.spriteSheet = new createjs.SpriteSheet({
@@ -60,7 +60,7 @@ define(['jquery', 'easeljs', 'utils'],
         var self = this,
             velocity = self.body.GetLinearVelocity();
 
-        velocity.x = 5;
+        velocity.x = self.walkSpeed;
 
         self.body.SetLinearVelocity(velocity);
 
@@ -85,6 +85,12 @@ define(['jquery', 'easeljs', 'utils'],
         else {
           self.setTick();
         }
+      };
+
+      self.remove = function () {
+        console.log(self.body, self.animation);
+        utils.world.DestroyBody(self.body);
+        utils.stage.removeChild(self.animation);
       };
 
       self.performCommand('stand right');
