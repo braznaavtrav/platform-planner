@@ -35,7 +35,7 @@ define(['jquery', 'easeljs', 'utils'],
       // attach spritesheet to dynamic body
       var fixDef = new utils.box2d.b2FixtureDef();
       fixDef.density = 1;
-      fixDef.friction = 0.2;
+      fixDef.friction = 0;
       fixDef.restitution = 0.2;
       var bodyDef = new utils.box2d.b2BodyDef();
       bodyDef.type = utils.box2d.b2Body.b2_dynamicBody;
@@ -51,7 +51,8 @@ define(['jquery', 'easeljs', 'utils'],
         self.animation.on('tick', function (e) {
           self.animation.x = self.body.GetPosition().x * utils.SCALE;
           self.animation.y = self.body.GetPosition().y * utils.SCALE + 12;
-          self.animation.rotation = self.body.GetAngle() * (180/Math.PI);
+          self.body.SetAngle(0);
+          // self.animation.rotation = self.body.GetAngle() * (180/Math.PI);
         });
       };
 
@@ -59,13 +60,14 @@ define(['jquery', 'easeljs', 'utils'],
         var self = this,
             velocity = self.body.GetLinearVelocity();
 
-        velocity.x = 40;
+        velocity.x = 5;
 
         self.body.SetLinearVelocity(velocity);
 
         self.animation.on('tick', function (e) {
           self.animation.x = self.body.GetPosition().x * utils.SCALE;
           self.animation.y = self.body.GetPosition().y * utils.SCALE + 12;
+          self.body.SetAngle(0);
           self.animation.rotation = self.body.GetAngle() * (180/Math.PI);
         });
       };

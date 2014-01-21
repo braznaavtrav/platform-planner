@@ -36,25 +36,24 @@ define(['jquery', 'box2dweb', 'easeljs'],
       var self = this;
       // create world
       this.world = new self.box2d.b2World(new self.box2d.b2Vec2(0, 50), false);
-      console.log(self.world);
 
       // create background
       var backgroundImage = new createjs.Bitmap('../img/background.png');
       this.stage.addChild(backgroundImage);
 
       // create ground
-      var fixDef = new self.box2d.b2FixtureDef();
-      fixDef.density = 1;
-      fixDef.friction = 0.5;
-      var bodyDef = new self.box2d.b2BodyDef();
-      bodyDef.type = self.box2d.b2Body.b2_staticBody;
-      bodyDef.position.x = 1024 / 2 / self.SCALE;
-      bodyDef.position.y = (768 / self.SCALE) - (5 / self.SCALE);
-      fixDef.shape = new self.box2d.b2PolygonShape();
-      fixDef.shape.SetAsBox(1024 / self.SCALE, 10 / self.SCALE);
-      this.world
-        .CreateBody(bodyDef)
-        .CreateFixture(fixDef);
+      // var fixDef = new self.box2d.b2FixtureDef();
+      // fixDef.density = 1;
+      // fixDef.friction = 0.5;
+      // var bodyDef = new self.box2d.b2BodyDef();
+      // bodyDef.type = self.box2d.b2Body.b2_staticBody;
+      // bodyDef.position.x = 1024 / 2 / self.SCALE;
+      // bodyDef.position.y = (768 / self.SCALE) - (5 / self.SCALE);
+      // fixDef.shape = new self.box2d.b2PolygonShape();
+      // fixDef.shape.SetAsBox(1024 / self.SCALE, 10 / self.SCALE);
+      // this.world
+      //   .CreateBody(bodyDef)
+      //   .CreateFixture(fixDef);
 
       // setup debug draw
       var debugDraw = new self.box2d.b2DebugDraw();
