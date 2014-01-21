@@ -35,7 +35,8 @@ define(['jquery', 'box2dweb', 'easeljs'],
     utils.setUpPhysics = function () {
       var self = this;
       // create world
-      this.world = new self.box2d.b2World(new self.box2d.b2Vec2(0, 50), true);
+      this.world = new self.box2d.b2World(new self.box2d.b2Vec2(0, 50), false);
+      console.log(self.world);
 
       // create background
       var backgroundImage = new createjs.Bitmap('../img/background.png');
