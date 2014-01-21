@@ -4,6 +4,5 @@
 
 - Refactor performCommand
 - Finish Animations
-- Reset Level
 - Piece Dragging
 - Dynamic Shadows
