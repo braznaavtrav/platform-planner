@@ -2,6 +2,5 @@
 
 ## TODO:
 
-- Finish Animations
 - Piece Dragging
 - Dynamic Shadows

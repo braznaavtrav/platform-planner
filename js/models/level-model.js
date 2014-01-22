@@ -28,17 +28,41 @@ define(['jquery', 'easeljs', 'utils', 'models/piece-model', 'models/character-mo
         // SET UP PIECES
         self.pieceBox= [];
         for (var i = 0; i < self.pieces.length; i++) {
-          self.pieceBox[i] = new createjs.Bitmap('../img/piece-' + self.pieces[i] + '.png');
-          self.pieceBox[i].name = self.pieces[i];
-          self.pieceBox[i].setTransform(10, 40 * i + 440, 0.7, 0.7);
-          utils.stage.addChild(self.pieceBox[i]);
+          var index = i;
+          self.pieceBox[index] = new createjs.Bitmap('../img/piece-' + self.pieces[index] + '.png');
+          self.pieceBox[index].name = self.pieces[index];
+          self.pieceBox[index].setTransform(10, 40 * index + 440, 0.7, 0.7);
+          utils.stage.addChild(self.pieceBox[index]);
 
-          self.pieceBox[i].on("pressmove", function(e) {
-            this.setTransform(e.stageX - 88, e.stageY - 22, 1, 1);
+          self.pieceBox[index].on("pressmove", function(e) {
+            var scale = 1;
+            // create ghost
+            if (!this.hasGhost) {
+              this.ghost = new createjs.Shape();
+              this.ghost.graphics.beginFill("#666").drawRect(10, 40 * index + 440, 123.2, 31.5);
+              console.log(this.ghost);
+              // this.ghost.setChildIndex(0);
+              utils.stage.addChild(this.ghost);
+              this.hasGhost = true;
+            }
+
+            if (e.stageX < 140) {
+              scale = 0.7;
+            }
+
+            this.setTransform(e.stageX - 88, e.stageY - 22, scale, scale);
           });
 
-          self.pieceBox[i].on("pressup", function(e) {
-            new Piece({x: e.stageX, y: e.stageY}, e.target.name);
+          self.pieceBox[index].on("pressup", function(e) {
+            // if in illegal place
+            // return to start
+            if (e.stageX < 140) {
+              scale = 0.7;
+            }
+            // else make piece
+            else {
+              new Piece({x: e.stageX, y: e.stageY}, e.target.name);
+            }
           });
         };
 
