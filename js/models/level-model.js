@@ -17,18 +17,30 @@ define(['jquery', 'easeljs', 'utils', 'models/piece-model', 'models/character-mo
 
         // SET UP COMMANDS
         self.commandBox = [];
-        self.commandTimeSeconds = 0;
         for (var i = 0; i < self.commands.length; i++) {
           self.commandBox[i] = new createjs.Text(self.commands[i].command.toUpperCase(), '800 13px Avenir', '#1B1464');
           self.commandBox[i].x = 70;
           self.commandBox[i].y = 30 * i + 50;
           self.commandBox[i].textAlign = 'center';
           utils.stage.addChild(self.commandBox[i]);
-
-          self.commandTimeSeconds += self.commands[i].seconds;
         };
 
         // SET UP PIECES
+        self.pieceBox= [];
+        for (var i = 0; i < self.pieces.length; i++) {
+          self.pieceBox[i] = new createjs.Bitmap('../img/piece-' + self.pieces[i] + '.png');
+          self.pieceBox[i].name = self.pieces[i];
+          self.pieceBox[i].setTransform(10, 40 * i + 440, 0.7, 0.7);
+          utils.stage.addChild(self.pieceBox[i]);
+
+          self.pieceBox[i].on("pressmove", function(e) {
+            this.setTransform(e.stageX - 88, e.stageY - 22, 1, 1);
+          });
+
+          self.pieceBox[i].on("pressup", function(e) {
+            new Piece({x: e.stageX, y: e.stageY}, e.target.name);
+          });
+        };
 
         // PLACE CHARACTER
         self.character = new Character();
@@ -51,7 +63,6 @@ define(['jquery', 'easeljs', 'utils', 'models/piece-model', 'models/character-mo
             self.running = false;
             self.goButton.text.text = 'RUN';
             self.goButton.shape.graphics.beginFill('#88FF4C').drawRect(0, 700, self.goButton.w, self.goButton.h);
-            console.log('resetting');
             self.character.remove();
             self.character = new Character();
           }
@@ -68,19 +79,7 @@ define(['jquery', 'easeljs', 'utils', 'models/piece-model', 'models/character-mo
       this.run = function () {
         var self = this;
 
-        // Todo: this for loop / setTimeout needs to be refactored,
-        //       probably using recursion.
-        for (var i = 0; i < self.commands.length; i++) {
-          self.character.performCommand(self.commands[i].command);
-          setTimeout( function () {
-            if (i === self.commands.length - 1) {
-              return;
-            }
-          }, self.commands[i].seconds * 1000);
-        };
-        setTimeout( function () {
-          self.character.performCommand('stand right');
-        }, self.commandTimeSeconds * 1000);
+        self.character.performCommand(self.commands);
       };
     };
 
