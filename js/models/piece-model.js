@@ -23,11 +23,19 @@ define(['jquery', 'utils'],
       this.view.body = utils.world.CreateBody(bodyDef);
       this.view.body.CreateFixture(fixDef);
       utils.stage.addChild(self.view);
+      
       this.view.on('tick', function (e) {
         this.x = this.body.GetPosition().x * utils.SCALE;
         this.y = this.body.GetPosition().y * utils.SCALE;
         this.rotation = this.body.GetAngle() * (180/Math.PI);
       });
+    };
+
+    Piece.prototype.remove = function () {
+      var self = this;
+
+      utils.stage.removeChild(self.view);
+      utils.world.DestroyBody(self.view.body);
     };
 
     return Piece;

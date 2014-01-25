@@ -35,25 +35,32 @@ define(['jquery', 'easeljs', 'utils', 'models/piece-model', 'models/character-mo
           utils.stage.addChild(self.pieceBox[index]);
 
           self.pieceBox[index].on("pressmove", function(e) {
-            var scale = 1;
+            var scale = 1,
+                pB = this;
             // create ghost
-            if (!this.hasGhost) {
-              this.ghost = new createjs.Shape();
-              this.ghost.graphics.beginFill("#666").drawRect(10, 40 * index + 440, 123.2, 31.5);
-              console.log(this.ghost);
-              // this.ghost.setChildIndex(0);
-              utils.stage.addChild(this.ghost);
-              this.hasGhost = true;
+            if (!pB.hasGhost) {
+              pB.ghost = new createjs.Shape();
+              pB.ghost.graphics.beginFill("rgba(0,0,0,0.1)").drawRect(10, 40 * index + 440, 123.2, 31.5);
+              console.log(pB.ghost);
+              utils.stage.addChildAt(pB.ghost, 1);
+              pB.hasGhost = true;
+            }
+
+            if (pB.piece) {
+              pB.piece.remove();
             }
 
             if (e.stageX < 140) {
               scale = 0.7;
             }
 
-            this.setTransform(e.stageX - 88, e.stageY - 22, scale, scale);
+            pB.setTransform(e.stageX - 88, e.stageY - 22, scale, scale);
           });
 
           self.pieceBox[index].on("pressup", function(e) {
+            var pB = this,
+                scale = 1;
+
             // if in illegal place
             // return to start
             if (e.stageX < 140) {
@@ -61,7 +68,7 @@ define(['jquery', 'easeljs', 'utils', 'models/piece-model', 'models/character-mo
             }
             // else make piece
             else {
-              new Piece({x: e.stageX, y: e.stageY}, e.target.name);
+              pB.piece = new Piece({x: e.stageX, y: e.stageY}, e.target.name);
             }
           });
         };
@@ -102,7 +109,7 @@ define(['jquery', 'easeljs', 'utils', 'models/piece-model', 'models/character-mo
 
       this.run = function () {
         var self = this;
-
+        // TODO: remove editing event listeners
         self.character.performCommand(self.commands);
       };
     };
