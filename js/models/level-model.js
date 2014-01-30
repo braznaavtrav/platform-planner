@@ -25,6 +25,25 @@ define(['jquery', 'easeljs', 'utils', 'models/piece-model', 'models/character-mo
           utils.stage.addChild(self.commandBox[i]);
         };
 
+        self.illegalPiecePlacement = function (e) {
+          console.log(e);
+          var tl = {
+                x: e.target.x, 
+                y: e.target.y 
+              },
+              br = {
+                x: e.target.x + (e.rawX - e.target.x),
+                y: e.target.y + (e.rawY - e.target.y)
+              };
+
+          for (var i = utils.stage.collisionAABB.list.length - 1; i >= 0; i--) {
+            if (!(br.x < utils.stage.collisionAABB.list[i].tl.x || utils.stage.collisionAABB.list[i].br.x < tl.x || br.y < utils.stage.collisionAABB.list[i].tl.y || utils.stage.collisionAABB.list[i].br.y < tl.y)) {
+              return true;
+            }
+          };
+          return false;
+        };
+
         // SET UP PIECES
         self.pieceBox= [];
         for (var i = 0; i < self.pieces.length; i++) {
@@ -37,11 +56,11 @@ define(['jquery', 'easeljs', 'utils', 'models/piece-model', 'models/character-mo
           self.pieceBox[index].on("pressmove", function(e) {
             var scale = 1,
                 pB = this;
+
             // create ghost
             if (!pB.hasGhost) {
               pB.ghost = new createjs.Shape();
               pB.ghost.graphics.beginFill("rgba(0,0,0,0.1)").drawRect(10, 40 * index + 440, 123.2, 31.5);
-              console.log(pB.ghost);
               utils.stage.addChildAt(pB.ghost, 1);
               pB.hasGhost = true;
             }
@@ -63,8 +82,9 @@ define(['jquery', 'easeljs', 'utils', 'models/piece-model', 'models/character-mo
 
             // if in illegal place
             // return to start
-            if (e.stageX < 140) {
+            if (e.stageX < 140 || self.illegalPiecePlacement(e)) {
               scale = 0.7;
+              pB.setTransform(10, 40 * index + 440, 0.7, 0.7);
             }
             // else make piece
             else {

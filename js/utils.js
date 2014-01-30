@@ -6,7 +6,7 @@ define(['jquery', 'box2dweb', 'easeljs'],
 
     utils.setUpApp = function () {
       var self = this;
-      this.box2d = {
+      self.box2d = {
         b2Vec2: Box2D.Common.Math.b2Vec2,
         b2BodyDef: Box2D.Dynamics.b2BodyDef,
         b2Body: Box2D.Dynamics.b2Body,
@@ -18,10 +18,10 @@ define(['jquery', 'box2dweb', 'easeljs'],
         b2CircleShape: Box2D.Collision.Shapes.b2CircleShape,
         b2DebugDraw: Box2D.Dynamics.b2DebugDraw
       };
-      this.SCALE = 30;
-      this.stage = new createjs.Stage(document.getElementById('display'));
+      self.SCALE = 30;
+      self.stage = new createjs.Stage(document.getElementById('display'));
 
-      this.debug = document.getElementById('debug');
+      self.debug = document.getElementById('debug');
 
       createjs.Ticker.addEventListener('tick', function() {
         self.tick();
@@ -30,6 +30,23 @@ define(['jquery', 'box2dweb', 'easeljs'],
       createjs.Ticker.setFPS(60);
       createjs.Ticker.useRAF = true;
 
+      self.stage.collisionAABB = {
+        list: [],
+        add: function (view) {
+          var aabb = {
+            tl: {
+              x: view.x - view.regX,
+              y: view.y - view.regY
+            },
+            br: {
+              x: view.x + view.regX,
+              y: view.y + view.regY
+            }
+          };
+
+          this.list.push(aabb);
+        }
+      };
     };
 
     utils.setUpPhysics = function () {
