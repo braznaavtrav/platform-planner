@@ -4,6 +4,16 @@ define(['jquery', 'box2dweb', 'easeljs'],
 
     var utils = {};
 
+    utils.config = {};
+    utils.config.pieces = {};
+    utils.config.pieces['normal'] = {
+      density: 1,
+      friction: 0,
+      restitution: 0.1
+    };
+    utils.config.pieces['start'] = utils.config.pieces['normal'];
+    utils.config.pieces['finish'] = utils.config.pieces['normal'];
+
     utils.setUpApp = function () {
       var self = this;
       self.box2d = {

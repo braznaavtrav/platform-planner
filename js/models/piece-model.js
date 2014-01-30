@@ -11,9 +11,9 @@ define(['jquery', 'utils'],
       this.view.regX = width/2;
       this.view.regY = height/2;
       var fixDef = new utils.box2d.b2FixtureDef();
-      fixDef.density = 1;
-      fixDef.friction = 0;
-      fixDef.restitution = 0.1;
+      fixDef.density = utils.config.pieces[name].density;
+      fixDef.friction = utils.config.pieces[name].friction;
+      fixDef.restitution = utils.config.pieces[name].restitution;
       var bodyDef = new utils.box2d.b2BodyDef();
       bodyDef.type = utils.box2d.b2Body.b2_staticBody;
       bodyDef.position.x = pos.x / utils.SCALE;
