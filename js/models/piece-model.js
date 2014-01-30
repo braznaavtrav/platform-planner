@@ -40,6 +40,7 @@ define(['jquery', 'utils'],
       var self = this;
 
       utils.stage.removeChild(self.view);
+      utils.stage.collisionAABB.remove(self.view);
       utils.world.DestroyBody(self.view.body);
     };
 

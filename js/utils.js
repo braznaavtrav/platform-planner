@@ -34,6 +34,7 @@ define(['jquery', 'box2dweb', 'easeljs'],
         list: [],
         add: function (view) {
           var aabb = {
+            view_id: view.id,
             tl: {
               x: view.x - view.regX,
               y: view.y - view.regY
@@ -45,6 +46,11 @@ define(['jquery', 'box2dweb', 'easeljs'],
           };
 
           this.list.push(aabb);
+        },
+        remove: function (view) {
+          self.stage.collisionAABB.list = self.stage.collisionAABB.list.filter(function (aabb) { 
+            return aabb.view_id !== view.id;
+          });
         }
       };
     };

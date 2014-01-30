@@ -26,7 +26,6 @@ define(['jquery', 'easeljs', 'utils', 'models/piece-model', 'models/character-mo
         };
 
         self.illegalPiecePlacement = function (e) {
-          console.log(e);
           var tl = {
                 x: e.target.x, 
                 y: e.target.y 
