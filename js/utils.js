@@ -26,7 +26,8 @@ define(['jquery', 'box2dweb', 'easeljs'],
         b2MassData: Box2D.Collision.Shapes.b2MassData,
         b2PolygonShape: Box2D.Collision.Shapes.b2PolygonShape,
         b2CircleShape: Box2D.Collision.Shapes.b2CircleShape,
-        b2DebugDraw: Box2D.Dynamics.b2DebugDraw
+        b2DebugDraw: Box2D.Dynamics.b2DebugDraw,
+        b2ContactListener: Box2D.Dynamics.b2ContactListener
       };
       self.SCALE = 30;
       self.stage = new createjs.Stage(document.getElementById('display'));
@@ -74,26 +75,36 @@ define(['jquery', 'box2dweb', 'easeljs'],
       var backgroundImage = new createjs.Bitmap('../img/background.png');
       this.stage.addChild(backgroundImage);
 
-      // create ground
-      // var fixDef = new self.box2d.b2FixtureDef();
-      // fixDef.density = 1;
-      // fixDef.friction = 0.5;
-      // var bodyDef = new self.box2d.b2BodyDef();
-      // bodyDef.type = self.box2d.b2Body.b2_staticBody;
-      // bodyDef.position.x = 1024 / 2 / self.SCALE;
-      // bodyDef.position.y = (768 / self.SCALE) - (5 / self.SCALE);
-      // fixDef.shape = new self.box2d.b2PolygonShape();
-      // fixDef.shape.SetAsBox(1024 / self.SCALE, 10 / self.SCALE);
-      // this.world
-      //   .CreateBody(bodyDef)
-      //   .CreateFixture(fixDef);
-
       // setup debug draw
       var debugDraw = new self.box2d.b2DebugDraw();
       debugDraw.SetSprite(debug.getContext('2d'));
       debugDraw.SetDrawScale(self.SCALE);
       debugDraw.SetFlags(self.box2d.b2DebugDraw.e_shapeBit | self.box2d.b2DebugDraw.e_jointBit);
       self.world.SetDebugDraw(debugDraw);
+
+      //Add listeners for contact
+      var listener = new self.box2d.b2ContactListener;
+
+      listener.BeginContact = function(contact) {
+        var a = contact.m_fixtureA.m_body.m_userData,
+            b = contact.m_fixtureB.m_body.m_userData;
+
+        if ((a === 'character' && b === 'finish') || (b === 'character' && a === 'finish')) {
+          console.log('level over!!')
+        };
+      };
+
+      listener.EndContact = function(contact) {
+      };
+
+      listener.PostSolve = function(contact, impulse) {
+       
+      };
+
+      listener.PreSolve = function(contact, oldManifold) {
+      };
+
+      this.world.SetContactListener(listener);
     };
 
     utils.tick = function () {

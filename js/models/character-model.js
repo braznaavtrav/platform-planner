@@ -66,6 +66,7 @@ define(['jquery', 'easeljs', 'utils'],
       fixDef.shape.SetAsBox(width/2/utils.SCALE, height/2/utils.SCALE);
       self.body = utils.world.CreateBody(bodyDef);
       self.body.CreateFixture(fixDef);
+      self.body.SetUserData('character');
 
       self.animation.on('tick', function (e) {
         self.animation.x = self.body.GetPosition().x * utils.SCALE;
@@ -73,6 +74,8 @@ define(['jquery', 'easeljs', 'utils'],
         self.body.SetAngle(0);
         self.animation.rotation = self.body.GetAngle() * (180/Math.PI);
       });
+
+      console.log(self.body);
 
       self.stand = function () {
         var self = this,

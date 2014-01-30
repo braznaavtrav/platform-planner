@@ -23,6 +23,7 @@ define(['jquery', 'utils'],
       this.view.body = utils.world.CreateBody(bodyDef);
       this.view.body.CreateFixture(fixDef);
       utils.stage.addChild(self.view);
+      this.view.body.SetUserData(name);
 
       this.view.on('tick', function (e) {
         this.x = this.body.GetPosition().x * utils.SCALE;
